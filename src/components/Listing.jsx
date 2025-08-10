@@ -42,7 +42,7 @@ export default function Listing() {
       <div className="overflow-x-auto rounded-xl shadow-lg bg-white dark:bg-gray-900 p-6 w-full max-w-6xl">
         <button
           type="button"
-          className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-4 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800 float-right transition duration-300"
+          className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-4 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800 float-right transition duration-300 cursor-pointer" 
           onClick={handleAdd}
         >
           Add Task
@@ -94,7 +94,7 @@ export default function Listing() {
                   <td className="px-6 py-4 items-center flex justify-center">
                     <button
                       type="button"
-                      className="text-indigo-600 hover:text-indigo-900 dark:hover:text-indigo-400 font-semibold underline transition"
+                      className="text-indigo-600 hover:text-indigo-900 dark:hover:text-indigo-400 font-semibold underline transition cursor-pointer"
                       onClick={e => {
                         e.stopPropagation();
                         handleEdit(project);
@@ -127,7 +127,7 @@ export default function Listing() {
             <button
               key={index}
               onClick={() => setCurrentPage(index + 1)}
-              className={`px-3 py-1 rounded-lg transition ${
+              className={`px-3 py-1 rounded-lg transition cursor-pointer ${
                 currentPage === index + 1
                   ? "bg-blue-600 text-white"
                   : "bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600"
@@ -142,7 +142,7 @@ export default function Listing() {
               setCurrentPage((prev) => Math.min(prev + 1, totalPages))
             }
             disabled={currentPage === totalPages}
-            className={`px-4 py-2 rounded-lg transition ${
+            className={`px-4 py-2 rounded-lg transition cursor-pointer ${
               currentPage === totalPages
                 ? "bg-gray-300 dark:bg-gray-700 cursor-not-allowed"
                 : "bg-blue-600 hover:bg-blue-700 text-white"

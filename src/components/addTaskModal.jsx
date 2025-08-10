@@ -53,7 +53,7 @@ export default function AddTaskModal({ show, onClose, onSubmit, initialValues })
                 onClick={(e) => e.stopPropagation()} // prevent closing when clicking inside
             >
                 <button
-                    className="absolute top-3 right-3 text-gray-400 hover:text-red-500 transition"
+                    className="absolute top-3 right-3 text-gray-400 hover:text-red-500 transition cursor-pointer"
                     onClick={onClose}
                 >
                     <AiOutlineClose size={20} />
