@@ -1,8 +1,12 @@
 import { useState, useEffect } from "react";
 import { AiOutlineClose } from 'react-icons/ai';
 
+import { useDispatch } from 'react-redux';
+import { addProject,editProject } from '../features/task.js';
+
 export default function AddTaskModal({ show, onClose, onSubmit, initialValues }) {
-   const [form, setForm] = useState({
+    const dispatch = useDispatch();
+    const [form, setForm] = useState({
         projectName: "",
         projectDescription: "",
         priority: "Low",
@@ -32,14 +36,23 @@ export default function AddTaskModal({ show, onClose, onSubmit, initialValues })
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        onSubmit(form);
-        setForm({
-            projectName: "",
-            projectDescription: "",
-            priority: "Low",
-            startDate: "",
-            endDate: ""
-        });
+        console.log(initialValues);
+        
+        if (initialValues) {
+            // Editing existing task
+            dispatch(editProject({ ...form, id: initialValues.id }));
+        } else {
+            // Adding new task
+            dispatch(addProject({
+                id: Date.now().toString(),
+                ...form,
+                projectDeadline: form.endDate,
+                projectStartDate: form.startDate,
+                projectEndDate: form.endDate,
+                creationDate: new Date().toISOString().split('T')[0],
+                comments: [],
+            }));
+        }
         onClose();
     };
 
@@ -141,7 +154,7 @@ export default function AddTaskModal({ show, onClose, onSubmit, initialValues })
                         type="submit"
                         className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg shadow-md transition transform hover:scale-105"
                     >
-                        {initialValues?"Update Task":"Add Task"}
+                        {initialValues ? "Update Task" : "Add Task"}
                     </button>
                 </form>
             </div>

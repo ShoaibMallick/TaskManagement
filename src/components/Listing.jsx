@@ -1,11 +1,28 @@
 import { useState } from "react";
+import ProjectSummary from '../features/ProjectSummary';
 import { NavLink } from "react-router-dom";
 import projects from "../data/project";
 import moment from "moment";
 import AddTaskModal from "./addTaskModal";
-import { PiNotePencilLight } from 'react-icons/pi';
+import { PiNotePencilLight} from 'react-icons/pi';
+import { BiAnalyse } from "react-icons/bi";
+
+import { useSelector } from 'react-redux';
+import { useNavigate } from "react-router-dom";
 
 export default function Listing() {
+  const projects = useSelector(state => state.project.projects);
+  const navigate = useNavigate();
+  // Modal state for BI Analyze
+  const [showSummaryModal, setShowSummaryModal] = useState(false);
+  const [selectedProjectId, setSelectedProjectId] = useState(null);
+  // Handler for BI Analyze
+  const handleAnalyze = (projectId) => {
+    setSelectedProjectId(projectId);
+    setShowSummaryModal(true);
+  };
+
+
   const [showModal, setShowModal] = useState(false);
   const [editTask, setEditTask] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -22,6 +39,7 @@ export default function Listing() {
   // Open modal for edit and fill values
   const handleEdit = (project) => {
     setEditTask({
+      id: project.id,
       projectName: project.projectName,
       projectDescription: project.projectDescription,
       priority: project.priority,
@@ -37,12 +55,17 @@ export default function Listing() {
     setShowModal(true);
   };
 
+    const redireactToDetails = (projectId) => {
+    const project = projects.find(p => p.id === projectId);
+    navigate(`/projectdetails/${projectId}`, { state: { project } });
+  };
+
   return (
     <div className="flex justify-center m-4 bg-gray-100 dark:bg-gray-900">
       <div className="overflow-x-auto rounded-xl shadow-lg bg-white dark:bg-gray-900 p-6 w-full max-w-6xl">
         <button
           type="button"
-          className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-4 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800 float-right transition duration-300 cursor-pointer" 
+          className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-4 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800 float-right transition duration-300 cursor-pointer"
           onClick={handleAdd}
         >
           Add Task
@@ -73,14 +96,15 @@ export default function Listing() {
               (project, idx) => (
                 <tr
                   key={project.projectName}
-                  className={`transition hover:bg-indigo-100 dark:hover:bg-gray-800 cursor-pointer ${
-                    idx % 2 === 0
-                      ? "bg-white dark:bg-gray-900"
-                      : "bg-gray-50 dark:bg-gray-800"
-                  } rounded-lg`}
-                  onClick={() =>
-                    (window.location.href = `/projectdetails/${project.id}`)
-                  }
+                  className={`transition hover:bg-indigo-100 dark:hover:bg-gray-800 cursor-pointer ${idx % 2 === 0
+                    ? "bg-white dark:bg-gray-900"
+                    : "bg-gray-50 dark:bg-gray-800"
+                    } rounded-lg`}
+                  // onClick={() =>
+                  //   (window.location.href = `/projectdetails/${project.id}`)
+                  // }
+
+                  onClick={() => redireactToDetails(project.id)}
                   style={{ transition: "background 0.2s" }}
                 >
                   <td className="px-6 py-4 font-medium whitespace-nowrap">
@@ -100,7 +124,17 @@ export default function Listing() {
                         handleEdit(project);
                       }}
                     >
-                      <PiNotePencilLight size={20}/>
+                      <PiNotePencilLight size={20} />
+                    </button>
+                    <button
+                      type="button"
+                      className="text-indigo-600 hover:text-indigo-900 dark:hover:text-indigo-400 font-semibold underline transition cursor-pointer ml-3"
+                      onClick={e => {
+                        e.stopPropagation();
+                        handleAnalyze(project.id);
+                      }}
+                    >
+                      <BiAnalyse />
                     </button>
                   </td>
                 </tr>
@@ -114,11 +148,10 @@ export default function Listing() {
           <button
             onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
             disabled={currentPage === 1}
-            className={`px-4 py-2 rounded-lg transition ${
-              currentPage === 1
-                ? "bg-gray-300 dark:bg-gray-700 cursor-not-allowed"
-                : "bg-blue-600 hover:bg-blue-700 text-white"
-            }`}
+            className={`px-4 py-2 rounded-lg transition ${currentPage === 1
+              ? "bg-gray-300 dark:bg-gray-700 cursor-not-allowed"
+              : "bg-blue-600 hover:bg-blue-700 text-white"
+              }`}
           >
             Prev
           </button>
@@ -127,11 +160,10 @@ export default function Listing() {
             <button
               key={index}
               onClick={() => setCurrentPage(index + 1)}
-              className={`px-3 py-1 rounded-lg transition cursor-pointer ${
-                currentPage === index + 1
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600"
-              }`}
+              className={`px-3 py-1 rounded-lg transition cursor-pointer ${currentPage === index + 1
+                ? "bg-blue-600 text-white"
+                : "bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600"
+                }`}
             >
               {index + 1}
             </button>
@@ -142,11 +174,10 @@ export default function Listing() {
               setCurrentPage((prev) => Math.min(prev + 1, totalPages))
             }
             disabled={currentPage === totalPages}
-            className={`px-4 py-2 rounded-lg transition cursor-pointer ${
-              currentPage === totalPages
-                ? "bg-gray-300 dark:bg-gray-700 cursor-not-allowed"
-                : "bg-blue-600 hover:bg-blue-700 text-white"
-            }`}
+            className={`px-4 py-2 rounded-lg transition cursor-pointer ${currentPage === totalPages
+              ? "bg-gray-300 dark:bg-gray-700 cursor-not-allowed"
+              : "bg-blue-600 hover:bg-blue-700 text-white"
+              }`}
           >
             Next
           </button>
@@ -158,6 +189,10 @@ export default function Listing() {
           onSubmit={() => setShowModal(false)}
           initialValues={editTask}
         />
+          {/* BI Analyze Summary Modal */}
+          {showSummaryModal && (
+            <ProjectSummary projectId={selectedProjectId} onClose={() => setShowSummaryModal(false)} />
+          )}
       </div>
     </div>
   );

@@ -1,16 +1,20 @@
 import { useState } from 'react';
-import { useParams } from 'react-router-dom';
-import projects from '../data/project';
+import { useParams, useLocation } from 'react-router-dom';
 import users from '../data/users';
 import moment from 'moment';
 
+import { useDispatch, useSelector } from 'react-redux';
+import { addComment } from '../features/task'; // adjust path as needed
+
 function ProjectDetails() {
+  const dispatch = useDispatch();
   const { id } = useParams();
-  const project = projects.find(p => p.id === id);
+
+  // Always get project from Redux for up-to-date comments
+  const project = useSelector(state => state.project.projects.find(p => p.id === id));
 
   const [comment, setComment] = useState('');
   const [user, setUser] = useState('');
-  const [comments, setComments] = useState(project ? project.comments : []);
 
   if (!project) {
     return (
@@ -31,8 +35,7 @@ function ProjectDetails() {
       comment,
       date: new Date().toISOString(),
     };
-
-    setComments(prev => [...prev, newComment]);
+    dispatch(addComment({ projectId: id, comment: newComment }));
     setComment('');
     setUser('');
   };
@@ -40,7 +43,7 @@ function ProjectDetails() {
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900 p-4 w-full">
       <div className="max-w-3xl w-full bg-white dark:bg-gray-900 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden transform transition-all duration-300 hover:scale-[1.01]">
-        
+
         {/* Header */}
         <div className="bg-gradient-to-r from-purple-500 to-pink-500 px-6 py-5">
           <h2 className="text-3xl font-bold text-white">{project.projectName}</h2>
@@ -60,13 +63,12 @@ function ProjectDetails() {
           <div>
             <span className="font-semibold text-gray-800 dark:text-gray-200 mr-2">Priority:</span>
             <span
-              className={`px-3 py-1 rounded-full text-white text-xs font-medium shadow ${
-                project.priority === "High"
+              className={`px-3 py-1 rounded-full text-white text-xs font-medium shadow ${project.priority === "High"
                   ? "bg-red-500"
                   : project.priority === "Medium"
-                  ? "bg-yellow-500"
-                  : "bg-green-500"
-              }`}
+                    ? "bg-yellow-500"
+                    : "bg-green-500"
+                }`}
             >
               {project.priority}
             </span>
@@ -78,11 +80,11 @@ function ProjectDetails() {
               Progress Comments
             </h3>
 
-            {comments.length === 0 ? (
+            {project.comments.length === 0 ? (
               <p className="text-sm text-gray-500">No comments yet.</p>
             ) : (
               <ul className="list-disc pl-5 space-y-2">
-                {comments.map((c, idx) => (
+                {project.comments.map((c, idx) => (
                   <li key={idx} className="text-gray-700 dark:text-gray-300">
                     <span className="font-medium">{c.user}:</span> {c.comment}
                     <span className="block text-xs text-gray-500">
