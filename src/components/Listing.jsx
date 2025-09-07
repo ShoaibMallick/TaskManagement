@@ -89,7 +89,7 @@ export default function Listing() {
                   <td className="px-6 py-4">{project.projectDescription}</td>
                   <td className="px-6 py-4">{project.priority}</td>
                   <td className="px-6 py-4">
-                    {moment(project.projectDeadline).format("MMMM Do YYYY")}
+                    {moment(project.projectDeadline).format("ll")}
                   </td>
                   <td className="px-6 py-4 items-center flex justify-center">
                     <button
